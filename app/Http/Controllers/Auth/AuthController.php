@@ -34,31 +34,36 @@ class AuthController extends Controller
      * Handle Login Submission
      */
     public function postLogin(Request $request): RedirectResponse
-{
-    $request->validate([
-        'email' => 'required',
-        'password' => 'required',
-    ]);
+    {
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required',
+        ]);
 
-    $credentials = $request->only('email', 'password');
-    // dd($credentials);
-    if (Auth::attempt($credentials)) {
-        return redirect()->intended('dashboard')->withSuccess('You have successfully logged in.');
-    } else {
-        // Debug failed login attempt
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return redirect("login")->withErrors(['email' => 'User not found.']);
+        $credentials = $request->only('email', 'password');
+        
+        if (Auth::attempt($credentials)) {
+            // Check user role and redirect accordingly
+            if (Auth::user()->user_role === 'admin') {
+                return redirect()->route('admin.dashboard')->withSuccess('Welcome, Admin!');
+            } else {
+                return redirect()->intended('dashboard')->withSuccess('You have successfully logged in.');
+            }
+        } else {
+            // Debug failed login attempt
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return redirect("login")->withErrors(['email' => 'User not found.']);
+            }
+
+            // Check if the password matches the hash
+            if (!Hash::check($request->password, $user->password)) {
+                return redirect("login")->withErrors(['password' => 'Password is incorrect.']);
+            }
+
+            return redirect("login")->withErrors(['email' => 'Invalid credentials.']);
         }
-
-        // Check if the password matches the hash
-        if (!Hash::check($request->password, $user->password)) {
-            return redirect("login")->withErrors(['password' => 'Password is incorrect.']);
-        }
-
-        return redirect("login")->withErrors(['email' => 'Invalid credentials.']);
     }
-}
 
 
     /**

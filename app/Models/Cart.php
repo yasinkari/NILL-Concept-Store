@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
+class Cart extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'orderID';
+    protected $primaryKey = 'cartID';
     protected $fillable = [
         'userID',
-        'paymentID',
         'productID',
-        'order_date',
-        'total_amount'
+        'totalAmount'
     ];
 
     public function user()
@@ -23,18 +21,13 @@ class Order extends Model
         return $this->belongsTo(User::class, 'userID');
     }
 
-    public function payment()
-    {
-        return $this->belongsTo(Payment::class, 'paymentID');
-    }
-
     public function product()
     {
         return $this->belongsTo(Product::class, 'productID');
     }
 
-    public function tracking()
+    public function cartRecords()
     {
-        return $this->hasOne(Tracking::class, 'orderID');
+        return $this->hasMany(CartRecord::class, 'cartID');
     }
 }

@@ -9,13 +9,11 @@ class CreateProductsTable extends Migration
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->decimal('price', 10, 2);
-            $table->enum('status', ['in_stock', 'low_stock', 'out_of_stock']);
-            $table->string('image');
-            $table->boolean('is_visible')->default(true);
-            $table->json('details');  // Store product variants as JSON
+            $table->id('productID');
+            $table->string('product_name');
+            $table->decimal('product_price', 10, 2);
+            $table->integer('product_stock');
+            $table->text('product_description');
             $table->timestamps();
         });
     }
